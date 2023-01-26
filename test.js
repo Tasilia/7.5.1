@@ -33,8 +33,11 @@ describe("ticketBooking", () => {
   });
 
   test("should book a ticket tomorrow", async () => {
-    const data = await getText(page, ".page-nav a + a span + span");
-    await clickElement(page, ".page-nav a + a");
+    const data = await getText(
+      page,
+      ".page-nav__day:nth-of-type(2) .page-nav__day-number"
+    );
+    await clickElement(page, ".page-nav__day:nth-of-type(2)");
     await clickElement(
       page,
       ".movie-seances__time:not(.acceptin-button-disabled)"
@@ -53,7 +56,9 @@ describe("ticketBooking", () => {
     expect(await getText(page, ".ticket__check-title")).toEqual(
       "ВЫ ВЫБРАЛИ БИЛЕТЫ:"
     );
-    expect(await getText(page, "div p + p + p + p span")).toContain(data);
+    expect(
+      await getText(page, ".ticket__info:nth-of-type(4) .ticket__details")
+    ).toContain(data);
   });
 
   test("choice of reserved seat", async () => {
@@ -65,7 +70,10 @@ describe("ticketBooking", () => {
       visible: true,
     });
     await clickElement(page, ".buying-scheme__chair_taken");
-    await clickElement(page, "button.acceptin-button");
-    expect(await page.$(".buying").visible);
+    const actual = await page.$eval(
+      "button.acceptin-button",
+      (el) => el.disabled
+    );
+    expect(actual).toEqual(true);
   });
 });

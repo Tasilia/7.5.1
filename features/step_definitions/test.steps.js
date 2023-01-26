@@ -19,7 +19,7 @@ After(async function () {
 });
 
 Given("user is on {string} page", async function (string) {
-  return await this.page.goto(`http://qamid.tmweb.ru/client${string}`, {
+  return await this.page.goto(`${string}`, {
     setTimeout: 5000,
   });
 });
@@ -51,13 +51,18 @@ Then("user sees the ticket booking confirmation", async function () {
 });
 
 When("user choose tomorrow", async function () {
-  const data = await getText(this.page, ".page-nav a + a span + span");
-  await clickElement(this.page, ".page-nav a + a");
+  const data = await getText(
+    this.page,
+    ".page-nav__day:nth-of-type(2) .page-nav__day-number"
+  );
+  await clickElement(this.page, ".page-nav__day:nth-of-type(2)");
   this.data = data;
 });
 
 Then("user sees the data", async function () {
-  expect(await getText(this.page, "div p + p + p + p span")).contain(this.data);
+  expect(
+    await getText(this.page, ".ticket__info:nth-of-type(4) .ticket__details")
+  ).contain(this.data);
 });
 
 When("user choose reserved chair", async function () {
@@ -65,9 +70,12 @@ When("user choose reserved chair", async function () {
     visible: true,
   });
   await clickElement(this.page, ".buying-scheme__chair_taken");
-  await clickElement(this.page, "button.acceptin-button");
 });
 
-Then("user stays on the purchase page", async function () {
-  expect(await this.page.$(".buying").visible);
+Then("button is not clickable", async function () {
+  const actual = await this.page.$eval(
+    "button.acceptin-button",
+    (el) => el.disabled
+  );
+  expect(actual).equal(true);
 });
